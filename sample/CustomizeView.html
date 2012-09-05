@@ -1,0 +1,168 @@
+<html>
+<head>
+<base href="../source/" />
+<script src="EventSource.js"></script>
+<script src="ViewModel.js"></script>
+<script src="HTMLTemplateParser.js"></script>
+<script src="HTMLTemplateView.js"></script>
+
+<script type="text/html-template" id="t">
+    <div style="width:100px;height:100px;">
+        <input @value="${value|input}" />
+        <$slider @value="${value|input}" @maxValue="500" />
+    </div>
+
+</script>
+
+<style>
+.slider {
+    box-sizing:border-box;
+    display:inline-block;
+    height:18px;
+    border-radius:9px;
+    border:solid 1px rgb(176,176,176);
+    margin:13px 13px 13px 13px;
+    line-height:12px;
+    -webkit-user-select:none;
+    /*-webkit-border-image:-webkit-linear-gradient(top,rgb(176,176,176) 0%,rgb(128,128,128) 100%);*/
+    background:-webkit-linear-gradient(bottom,rgb(222,222,222) 0%,rgb(255,255,255) 14%,rgb(231,231,231) 41%,rgb(186,186,186) 83%,rgb(144,144,144) 100%);
+}
+
+.slider .handler {
+    margin:-12px -12px -12px -12px;
+    box-sizing:border-box;
+    display:inline-block;
+    width:42px;
+    height:42px;
+    border-radius:21px;
+    border:solid 1px rgb(157,157,157);
+    background:-webkit-linear-gradient(top,rgb(166,166,166) 0%,rgb(250,250,250) 100%);
+    -webkit-box-shadow:inset 0 1px 1px rgba(255,255,255,0.75),0 1px 1px rgba(0,0,0,0.75);
+    vertical-align:middle;
+}
+
+.slider .filler {
+    box-sizing:border-box;
+    display:inline-block;
+    height:18px;
+    border-radius:9px;
+    border-top:solid 1px rgb(10,57,135);
+    border-bottom:solid 1px rgb(78,138,213);
+    margin:-3px -1px -1px -1px;
+    vertical-align:middle;
+    /*-webkit-border-image:-webkit-linear-gradient(top,rgb(176,176,176) 0%,rgb(128,128,128) 100%);*/
+    background:-webkit-linear-gradient(bottom,rgb(119,173,246) 0%,rgb(47,100,183) 85%,rgb(13,72,168) 100%);
+}
+
+
+</style>
+
+</head>
+
+<body>
+<div id="container">
+</div>
+<script type="text/javascript">
+
+function Slider(){
+    var root = document.createElement("div");
+    root.classList.add("slider");
+    var filler = document.createElement("div");
+    filler.classList.add("filler");
+    var handler = document.createElement("div");
+    handler.classList.add("handler");
+
+    root.appendChild(filler);
+    root.appendChild(handler);
+
+    var _maxValue = null;
+    var _width = null;
+    var _value = null;
+
+    Object.defineProperty(root,"value",{
+        get:function(){
+            return Number(_value);
+        },
+        set:function(v){
+            _value = v;
+            if(_width===null) {
+                filler.style.width = v + "px";
+            } else {
+                width.match(/([\s\S]+)([a-z]+)$/);
+                var num =parseFloat(RegExp.$1);
+                var unit = RegExp.$2;
+                filler.style.width = num*_value/_maxValue + unit;
+            }
+        }
+    })
+
+    Object.defineProperty(root,"maxValue",{
+        get:function(){
+            return Number(_maxValue);
+        },
+        set:function(v){
+            _maxValue = Number(v);
+            if(_width===null) {
+                root.style.width = (_maxValue+18) + "px";
+            }
+        }
+    })
+    Object.defineProperty(root,"width",{
+        get:function(){
+            return _width;
+        },
+        set:function(v){
+            _width = v;
+            root.style.width = v;
+            this.value = _value;
+        }
+    })
+
+    
+    var move = function(e){
+        var dx = e.clientX - x;
+
+        var v = startValue + dx/(root.offsetWidth-18)*_maxValue
+        if(v>_maxValue) {
+           v = _maxValue;
+        }
+        if(v<0) {
+           v = 0;
+        }
+        root.value = v;
+
+        var ev = document.createEvent('HTMLEvents');
+        ev.initEvent('input', true, true);
+        root.dispatchEvent(ev);
+    }
+    var endmove = function(e){
+        document.removeEventListener("mousemove",move,false)
+        document.removeEventListener("mouseup",endmove,false)
+    }
+    var startValue = _value
+    var x = 0;
+    handler.addEventListener("mousedown",function(e){
+        x = Number(e.clientX);
+        startValue = root.value;
+        document.addEventListener("mousemove",move,false)
+        document.addEventListener("mouseup",endmove,false)
+    },false)
+
+    return root;
+
+}
+HTMLTemplateView.views.slider = Slider;
+
+var view = new HTMLTemplateView();
+view.setTemplate(document.querySelector("#t").innerHTML);
+
+document.body.appendChild(view);
+
+var model = {
+    value:500,
+};
+var vm = new ViewModel(model);
+view.bind(vm);
+
+</script>
+</body></html>

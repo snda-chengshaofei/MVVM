@@ -1,0 +1,49 @@
+<html>
+<head>
+<base href="../source/" />
+<script src="EventSource.js"></script><script src="ViewModel.js"></script><script src="HTMLTemplateParser.js"></script><script src="HTMLTemplateView.js"></script>
+
+
+
+<script type="text/xhtml-template" id="t">
+    <h1>${text}</h1>
+    <div style="background:${rgb};">
+        <$list @data="${contacts}">
+            <span>${text}</span><input style="background:${rgb};" /><br/>
+        </$list>
+    </div>
+    <div style="background:${rgb};">
+        <$list @data="${contacts}">
+            <span>${text}</span><input @value="${rgb|input}" /><br/>
+        </$list>
+    </div>
+
+</script>
+
+</head>
+
+<body>
+<div id="container">
+</div>
+<script type="text/javascript">
+
+
+var view = new HTMLTemplateView();
+view.setTemplate(document.querySelector("#t").innerHTML);
+
+document.body.appendChild(view);
+
+var model = {
+    rgb:"#00FFFF",
+    text:"hellow",
+    contacts:[
+        {icon:"http://tp2.sinaimg.cn/1196343093/50/40000870994/1",rgb:"#FF0000",text:"hello1"},
+        {icon:"http://tp2.sinaimg.cn/1196343093/50/40000870994/1",rgb:"#00FF00",text:"hello2"},
+        {icon:"http://tp2.sinaimg.cn/1196343093/50/40000870994/1",rgb:"#0000FF",text:"hello3"}
+    ]
+};
+var vm = new ViewModel(model);
+view.bind(vm);
+
+</script>
+</body></html>

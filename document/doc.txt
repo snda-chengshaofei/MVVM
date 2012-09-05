@@ -1,0 +1,80 @@
+数据绑定
+
+在visionjs中，你可以绑定任何JS对象到TemplateView。
+
+请看以下示例：
+[code]
+
+在这里UI系统的结构是非常简单的 Model - View 结构（需要解释的是，实际上经典的MVC中的Controller的功用已经由HTML本身处理，这里的View实际上已经包含了一部分Controller的功能）。
+
+你仍然可以使用你熟悉的方式去监听事件、更新Model并通知TemplateView去响应它的变化。
+
+TemplateView具有快速地更换Model的能力（比起一些基于字符串的模板引擎，这很特别），你可以多次调用bind来更换数据来源。以下是示例：
+
+[code]
+
+visionjs并不对model做任何的限制，因此你可以很容易地将已有的系统中的对象不加修改地用于visionjs。尽管简单的View - Model看上去可以解决一些问题，但是对于大部分应用而言，这还不够，因此我们还引入了更强大的双向绑定机制。
+
+property和attribute
+
+HTML和XAML在一些设计理念上略有不同，因此在我们尝试完全引入为XAML设计的MVVM机制中遇到了特别的问题。
+
+在HTML中，property和attribute并非完全等价的概念：input.setAttribute("xxx",v);与input["xxx"] = v; 并不总是相同。请看以下例子：
+
+var input = document.createElement("input");
+input.setAttribute("value","123");
+
+var input = document.createElement("input");
+input["value"] = "abc";
+input.setAttribute("value","123");
+
+实际上，input元素的value attribute充当了默认值的角色。因此我们引入了@语法来绑定property:
+
+<input @value="${p}" />
+
+
+双向绑定
+
+一些View不仅仅是数据的呈现着，它们还同时承担着编辑的作用。visionjs提供了强大的双向绑定机制来处理这种情况。
+
+这里我们借鉴了WPF中MVVM模式的思路，引入了ViewModel对象。
+
+在基本的需要中，ViewModel的使用非常简单，你仅仅需要把Model对象作为参数传入ViewModel中。
+
+ViewModel对象能够比普通对象更好地支撑View的需要，同是它充当了双向翻译UI中的概念转换和Model中的概念的任务。
+
+<input @value="${p|input}" />
+
+这里|后面表示更新用户的变化到ViewModel的时机。这是一个事件名，你可以指定一个或者多个事件
+
+<input @value="${p|blur}" />
+
+<input @value="${p|keyup|paste|drop}" />
+
+列表
+
+如果一个标签以$开头，那就意味着它是一个visionjs的view，而不是一个普通的dom元素。
+
+$list是一个内置的类型，它用于呈现列表型的元素。
+
+<$list data="${arr}">
+
+</$list>
+
+$list生成的HTML代码含有<ul><li>结构，如果你希望纯粹地重复某段模板，则应该使用$repeater
+
+
+自定义ViewModel
+
+从Model自动生成ViewModel提供了最简单的默认操作，viewmodel对象支持完全自定义和扩展。
+
+ViewModel上可以自由定义属性，如以下：
+
+
+
+自定义组件
+
+visionjs还允许自定义像$list这样的组件
+
+命令
+有些控件并非专门用于
