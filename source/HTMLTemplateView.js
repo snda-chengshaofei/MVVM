@@ -3,7 +3,12 @@
     var obj = null;
     this.update = function(o){
         obj = o;
-        element[prop] =parts.length==1?parts[0].valueOf():parts.join("");
+
+        var props = prop.split(".");
+        var ele = element;
+        for(var i = 0; i < props.length-1; i++)
+            ele = ele[props[i]];
+        ele[props[props.length-1]] = parts.length==1?parts[0].valueOf():parts.join("");
     }
     this.appendText = function(text) {
         if(!text || text.length==0)
@@ -213,8 +218,13 @@ function HTMLTemplateView(){
                 }
                 if(attribute)
                     attribute.value = value;
-                if(property)
-                    elements[elements.length-1][property] = value;
+                if(property) {
+                    var props = property.split(".");
+                    var ele = elements[elements.length-1];
+                    for(var i = 0; i < props.length-1; i++)
+                        ele = ele[props[i]];
+                    ele[props[props.length-1]] = value;
+                }
                 
             }            
         },

@@ -1,0 +1,34 @@
+<html>
+<head>
+<base href="../source/" />
+<script src="EventSource.js"></script><script src="ViewModel.js"></script><script src="HTMLTemplateParser.js"></script><script src="HTMLTemplateView.js"></script>
+
+
+
+<script type="text/xhtml-template" id="t">
+<input style="background:${rgb};" /><br/>
+<input @value="${rgb|blur}" /><br/>
+
+</script>
+
+</head>
+
+<body>
+<div id="container">
+</div>
+<script type="text/javascript">
+
+
+var view = new HTMLTemplateView();
+view.setTemplate(document.querySelector("#t").innerHTML);
+
+document.body.appendChild(view);
+
+var model = {
+    rgb:"#00FFFF",
+};
+var vm = new ViewModel(model);
+view.bind(vm);
+
+</script>
+</body></html>
